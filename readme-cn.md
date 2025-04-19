@@ -20,13 +20,13 @@ VSLAM是一种利用视觉信息实现机器人或设备在未知环境中定位
 
 # 1. 全景相机的使用
 
-## 1) 申请sdk
+## 1.1) 申请sdk
 https://www.insta360.com/cn/sdk/record
 
 https://github.com/Insta360Develop/
 
 
-## 2） 连接相机
+## 1.2） 连接相机
 X4
 通过 USB 连接设备并在相机屏幕上选择Android 模式。
 
@@ -52,7 +52,7 @@ sudo make install
 Bus 001 Device 012: ID 2e1a:0002 SEM USB Keyboard
 ```
 
-## 3）安装SDK
+## 1.3）安装SDK
 解压申请之后的sdk文件LinuxSDK20241128.zip
 ``` bash
 sudo dpkg -i libMediaSDK-dev_2.0-6_amd64_ubuntu18.04.deb 
@@ -63,8 +63,82 @@ sudo dpkg -i libMediaSDK-dev_2.0-6_amd64_ubuntu18.04.deb
 sudo ./CameraSDKDemo //for ubuntu
 ```
 
-## 3）安装驱动程序
 
 # 2. stella_vslam 的运行
+follow https://stella-cv.readthedocs.io/en/latest/installation.html
 
 # 3. 连接全景相机，使用stella_vslam运行
+## 3.1）安装insta360 ros package
+follow https://github.com/ai4ce/insta360_ros_driver
+
+``` bash
+mkdir -p ~/360_ws/src
+cd ~/360_ws/src
+git clone -b humble https://github.com/ai4ce/insta360_ros_driver
+
+cp -r path/to/LinuxSDK20241128/CameraSDK-20241120_183228--1.1.0-Linux/include/camera/ ~/360_ws/src/insta360_ros_driver/include/
+cp -r path/to/LinuxSDK20241128/CameraSDK-20241120_183228--1.1.0-Linux/include/stream/ ~/360_ws/src/insta360_ros_driver/include/
+cp path/to/LinuxSDK20241128/CameraSDK-20241120_183228--1.1.0-Linux/lib/libCameraSDK.so ~/360_ws/src/insta360_ros_driver/lib/
+
+cd ~/360_ws
+sudo rosdep init
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install
+source install/setup.bash
+```
+
+code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros_driver/issues/13#issuecomment-2727005037)
+
+(1) line 100 in ~/360_ws/src/insta360_ros_driver/src/main.cpp
+``` bash
+ -        img_msg->encoding = "rgb8";
+ +        img_msg->encoding = "bgr8";
+```
+(2) void OnVideoData() in ~/360_ws/src/insta360_ros_driver/src/main.cpp
+``` c++
+    void OnVideoData(const uint8_t* data, size_t size, int64_t timestamp, uint8_t streamType, int stream_index = 0) override {
+        if (stream_index == 0) {
+            pkt->data = const_cast<uint8_t*>(data);
+            pkt->size = size;
+        }
+    
+        if (avcodec_send_packet(codecCtx, pkt) == 0) {
+            while (avcodec_receive_frame(codecCtx, avFrame) == 0) {
+                int width  = avFrame->width;
+                int height = avFrame->height;
+    
+                // Calculate required YUV buffer size (I420 format)
+                const int yuv_buffer_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, width, height, 1);
+                std::vector<uint8_t> yuv_buffer(yuv_buffer_size);
+    
+                // Efficiently copy YUV data to a continuous buffer
+                av_image_copy_to_buffer(yuv_buffer.data(), yuv_buffer_size,
+                                        avFrame->data, avFrame->linesize,
+                                        AV_PIX_FMT_YUV420P, width, height, 1);
+    
+                // Directly construct cv::Mat from the buffer (no additional copies)
+                cv::Mat yuv(height + height / 2, width, CV_8UC1, yuv_buffer.data());
+    
+                // Efficient color conversion
+                cv::Mat rgb;
+                cv::cvtColor(yuv, rgb, cv::COLOR_YUV2BGR_I420);
+    
+                // Efficient image slicing (no copies, only references)
+                int midPoint = width / 2;
+                cv::Mat frontImage = rgb(cv::Rect(midPoint, 0, midPoint, height));
+                cv::Mat backImage  = rgb(cv::Rect(0, 0, midPoint, height));
+    
+                // Uncomment if rotating is necessary:
+                // frontImage = rotateImage(frontImage, 90);
+                // backImage = rotateImage(backImage, -90);
+    
+                cv::Mat dualFisheyeImage;
+                cv::hconcat(frontImage, backImage, dualFisheyeImage);
+    
+                auto dualFisheyeMsg = matToImgMsg(dualFisheyeImage, "dual_fisheye_frame");
+                dual_fisheye_pub_->publish(*dualFisheyeMsg);
+            }
+        }
+    }
+```
