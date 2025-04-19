@@ -20,6 +20,51 @@ VSLAM是一种利用视觉信息实现机器人或设备在未知环境中定位
 
 # 1. 全景相机的使用
 
+## 1) 申请sdk
+https://www.insta360.com/cn/sdk/record
+
+https://github.com/Insta360Develop/
+
+
+## 2） 连接相机
+X4
+通过 USB 连接设备并在相机屏幕上选择Android 模式。
+
+在 Linux 上，请确保您的发行版已安装 libusb。
+
+您可以通过 yum 或 apt-get 安装
+``` bash
+sudo apt-get install libusb-dev
+sudo apt-get install libudev-dev
+```
+或从源代码构建
+``` bash
+wget http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.9/libusb-1.0.9.tar.bz2
+tar xjf libusb-1.0.9.tar.bz2
+cd libusb-1.0.9
+./configure 
+make
+sudo make install
+```
+安装驱动后，通过命令检查是否检测到相机lsusb，如果发现任何供应商 ID 为 0x2e1a 的 USB 设备，恭喜您，您的驱动已成功安装。
+如：
+``` bash
+Bus 001 Device 012: ID 2e1a:0002 SEM USB Keyboard
+```
+
+## 3）安装SDK
+解压申请之后的sdk文件LinuxSDK20241128.zip
+``` bash
+sudo dpkg -i libMediaSDK-dev_2.0-6_amd64_ubuntu18.04.deb 
+
+```
+注意：在Linux上，演示程序必须通过“ sudo ”运行，例如
+``` bash
+sudo ./CameraSDKDemo //for ubuntu
+```
+
+## 3）安装驱动程序
+
 # 2. stella_vslam 的运行
 
 # 3. 连接全景相机，使用stella_vslam运行
