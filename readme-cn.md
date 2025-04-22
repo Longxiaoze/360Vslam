@@ -65,7 +65,16 @@ sudo ./CameraSDKDemo //for ubuntu
 
 
 # 2. stella_vslam 的运行
-follow https://stella-cv.readthedocs.io/en/latest/installation.html
+follow [stella_vslam](https://stella-cv.readthedocs.io/en/latest/installation.html) and [stella_vslam_ros2](https://stella-cv.readthedocs.io/en/latest/ros2_package.html#installation) 
+
+``` bash
+sudo apt install ros-humble-image-publisher
+ros2 run image_publisher image_publisher_node /home/longxiaoze/Downloads/aist_living_lab_1/video.mp4  --ros-args --remap /image_raw:=/camera/image_raw
+source ~/ros2_ws/install/setup.bash
+ros2 run image_publisher image_publisher_node /home/longxiaoze/Downloads/aist_living_lab_1/video.mp4  --ros-args --remap /image_raw:=/camera/image_raw
+ros2 run image_publisher image_publisher_node /home/longxiaoze/Downloads/aist_living_lab_1/video.mp4  --ros-args --remap /image_raw:=/camera/image_raw
+```
+
 
 # 3. 连接全景相机，使用stella_vslam运行
 ## 3.1）安装insta360 ros package
