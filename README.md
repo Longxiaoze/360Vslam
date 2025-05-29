@@ -22,3 +22,8 @@ This project aims to develop a Visual Simultaneous Localization and Mapping (VSL
 
 # 3. Connecting the Panoramic Camera and Running stella_vslam
 
+
+
+ref:
+
+https://github.com/isri-aist/ros_insta360
