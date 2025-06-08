@@ -99,15 +99,8 @@ source install/setup.bash
 
 sudo apt install python3-pip
 pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu118
-<<<<<<< HEAD
-
 sudo apt update
 sudo apt install ros-humble-tf2-tools
-
-=======
-sudo apt update
-sudo apt install ros-humble-tf2-tools
->>>>>>> 83d2dede2876ec8f041edd9b7c83cd51d8c3cf41
 ```
 
 code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros_driver/issues/13#issuecomment-2727005037)
