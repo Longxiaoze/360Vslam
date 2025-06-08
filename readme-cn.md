@@ -65,7 +65,16 @@ sudo ./CameraSDKDemo //for ubuntu
 
 
 # 2. stella_vslam 的运行
-follow https://stella-cv.readthedocs.io/en/latest/installation.html
+follow [stella_vslam](https://stella-cv.readthedocs.io/en/latest/installation.html) and [stella_vslam_ros2](https://stella-cv.readthedocs.io/en/latest/ros2_package.html#installation) 
+
+``` bash
+sudo apt install ros-humble-image-publisher
+ros2 run image_publisher image_publisher_node /home/longxiaoze/Downloads/aist_living_lab_1/video.mp4  --ros-args --remap /image_raw:=/camera/image_raw
+source ~/ros2_ws/install/setup.bash
+ros2 run image_publisher image_publisher_node /home/longxiaoze/Downloads/aist_living_lab_1/video.mp4  --ros-args --remap /image_raw:=/camera/image_raw
+ros2 run image_publisher image_publisher_node /home/longxiaoze/Downloads/aist_living_lab_1/video.mp4  --ros-args --remap /image_raw:=/camera/image_raw
+```
+
 
 # 3. 连接全景相机，使用stella_vslam运行
 ## 3.1）安装insta360 ros package
@@ -74,7 +83,8 @@ follow https://github.com/ai4ce/insta360_ros_driver
 ``` bash
 mkdir -p ~/360_ws/src
 cd ~/360_ws/src
-git clone -b humble https://github.com/ai4ce/insta360_ros_driver
+# git clone -b humble https://github.com/ai4ce/insta360_ros_driver
+git clone -b humble https://github.com/Longxiaoze/insta360_ros_driver.git
 
 cp -r path/to/LinuxSDK20241128/CameraSDK-20241120_183228--1.1.0-Linux/include/camera/ ~/360_ws/src/insta360_ros_driver/include/
 cp -r path/to/LinuxSDK20241128/CameraSDK-20241120_183228--1.1.0-Linux/include/stream/ ~/360_ws/src/insta360_ros_driver/include/
@@ -89,10 +99,15 @@ source install/setup.bash
 
 sudo apt install python3-pip
 pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu118
+<<<<<<< HEAD
 
 sudo apt update
 sudo apt install ros-humble-tf2-tools
 
+=======
+sudo apt update
+sudo apt install ros-humble-tf2-tools
+>>>>>>> 83d2dede2876ec8f041edd9b7c83cd51d8c3cf41
 ```
 
 code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros_driver/issues/13#issuecomment-2727005037)
@@ -151,7 +166,6 @@ code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros
 ```
 
 ## 3.2）Publish insta360 X4 by ros2
-
 ``` bash
 ls /dev/insta
 sudo chmod 777 /dev/insta
@@ -165,9 +179,6 @@ ros2 run insta360_ros_driver yuv_driver
 rviz2
 
 ```
-
-
-
 
 ## 报错
 
