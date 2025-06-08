@@ -86,6 +86,13 @@ rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
+
+sudo apt install python3-pip
+pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu118
+
+sudo apt update
+sudo apt install ros-humble-tf2-tools
+
 ```
 
 code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros_driver/issues/13#issuecomment-2727005037)
@@ -142,3 +149,32 @@ code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros
         }
     }
 ```
+
+## 3.2）Publish insta360 X4 by ros2
+
+``` bash
+ls /dev/insta
+sudo chmod 777 /dev/insta
+
+source ~/360_ws/install/setup.bash
+cd ~/360_ws/src/insta360_ros_driver/
+./setup.sh
+ros2 launch insta360_ros_driver bringup.launch.py 
+# 或者
+ros2 run insta360_ros_driver yuv_driver
+rviz2
+
+```
+
+
+
+
+## 报错
+
+```
+[h264 @ 0x5e4871789980] non-existing PPS 0 referenced
+[h264 @ 0x5e4871789980] decode_slice_header error
+[h264 @ 0x5e4871789980] no frame!
+```
+解决：
+重新插拔insta360 X4的usb线(请尽可能使用原装线)
