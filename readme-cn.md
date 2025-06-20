@@ -103,62 +103,34 @@ sudo apt update
 sudo apt install ros-humble-tf2-tools
 ```
 
-code changing for insta X4: follow [issue](https://github.com/ai4ce/insta360_ros_driver/issues/13#issuecomment-2727005037)
-
-(1) line 100 in ~/360_ws/src/insta360_ros_driver/src/main.cpp
+## 3.2）Calib insta360 X4 fisheyes by ros2
+### 3.2.1 calib
+Run the camera driver
 ``` bash
- -        img_msg->encoding = "rgb8";
- +        img_msg->encoding = "bgr8";
-```
-(2) void OnVideoData() in ~/360_ws/src/insta360_ros_driver/src/main.cpp
-``` c++
-    void OnVideoData(const uint8_t* data, size_t size, int64_t timestamp, uint8_t streamType, int stream_index = 0) override {
-        if (stream_index == 0) {
-            pkt->data = const_cast<uint8_t*>(data);
-            pkt->size = size;
-        }
-    
-        if (avcodec_send_packet(codecCtx, pkt) == 0) {
-            while (avcodec_receive_frame(codecCtx, avFrame) == 0) {
-                int width  = avFrame->width;
-                int height = avFrame->height;
-    
-                // Calculate required YUV buffer size (I420 format)
-                const int yuv_buffer_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, width, height, 1);
-                std::vector<uint8_t> yuv_buffer(yuv_buffer_size);
-    
-                // Efficiently copy YUV data to a continuous buffer
-                av_image_copy_to_buffer(yuv_buffer.data(), yuv_buffer_size,
-                                        avFrame->data, avFrame->linesize,
-                                        AV_PIX_FMT_YUV420P, width, height, 1);
-    
-                // Directly construct cv::Mat from the buffer (no additional copies)
-                cv::Mat yuv(height + height / 2, width, CV_8UC1, yuv_buffer.data());
-    
-                // Efficient color conversion
-                cv::Mat rgb;
-                cv::cvtColor(yuv, rgb, cv::COLOR_YUV2BGR_I420);
-    
-                // Efficient image slicing (no copies, only references)
-                int midPoint = width / 2;
-                cv::Mat frontImage = rgb(cv::Rect(midPoint, 0, midPoint, height));
-                cv::Mat backImage  = rgb(cv::Rect(0, 0, midPoint, height));
-    
-                // Uncomment if rotating is necessary:
-                // frontImage = rotateImage(frontImage, 90);
-                // backImage = rotateImage(backImage, -90);
-    
-                cv::Mat dualFisheyeImage;
-                cv::hconcat(frontImage, backImage, dualFisheyeImage);
-    
-                auto dualFisheyeMsg = matToImgMsg(dualFisheyeImage, "dual_fisheye_frame");
-                dual_fisheye_pub_->publish(*dualFisheyeMsg);
-            }
-        }
-    }
+source ~/360_ws/install/setup.bash
+ls /dev/insta
+sudo chmod 777 /dev/insta
+ros2 run insta360_ros_driver insta360_ros_driver
 ```
 
-## 3.2）Publish insta360 X4 by ros2
+Activate image decoding
+``` bash
+source ~/360_ws/install/setup.bash
+ros2 run insta360_ros_driver decoder
+```
+
+Run the equirectangular node in calibration mode
+``` bash
+# ros2 run insta360_ros_driver equirectangular.py --calibrate
+python3 ~/360_ws/src/insta360_ros_driver/scripts/calibrate.py
+```
+
+open rviz2 to check calib
+``` bash
+rviz2
+```
+
+## 3.3）Publish insta360 X4 360 images by ros2
 ``` bash
 ls /dev/insta
 sudo chmod 777 /dev/insta
@@ -166,19 +138,21 @@ sudo chmod 777 /dev/insta
 source ~/360_ws/install/setup.bash
 cd ~/360_ws/src/insta360_ros_driver/
 ./setup.sh
-ros2 launch insta360_ros_driver bringup.launch.py 
-# 或者
-ros2 run insta360_ros_driver yuv_driver
+ros2 launch insta360_ros_driver bringup.launch.xml
+```
+
+``` bash
 rviz2
-
 ```
 
-## 报错
 
+``` bash
+source ~/ros2_ws/install/setup.bash
+cd ~/360_ws/src/insta360_ros_driver/config
+wget https://github.com/stella-cv/FBoW_orb_vocab/raw/main/orb_vocab.fbow
+cd ~/360_ws/src/insta360_ros_driver
+ros2 run stella_vslam_ros run_slam     -v  ./config/orb_vocab.fbow  -c ./config/insta360X4_equirectangular.yaml  --map-db-out  map.msg     --ros-args -p publish_tf:=false
 ```
-[h264 @ 0x5e4871789980] non-existing PPS 0 referenced
-[h264 @ 0x5e4871789980] decode_slice_header error
-[h264 @ 0x5e4871789980] no frame!
-```
-解决：
-重新插拔insta360 X4的usb线(请尽可能使用原装线)
+
+
+
