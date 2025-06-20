@@ -193,7 +193,7 @@ Finally, run SLAM with the published 360° stream:
 source ~/ros2_ws/install/setup.bash
 cd ~/360_ws/src/insta360_ros_driver/config
 wget https://github.com/stella-cv/FBoW_orb_vocab/raw/main/orb_vocab.fbow
-
+cd ~/360_ws/src/insta360_ros_driver
 # Execute SLAM
 ros2 run stella_vslam_ros run_slam \
   -v ./config/orb_vocab.fbow \
