@@ -1,29 +1,35 @@
-# VSLAM System for 360-Degree Panoramic Cameras
+# 360-Degree Panoramic Camera VSLAM System
+
+[中文说明](https://github.com/Longxiaoze/360Vslam/blob/main/readme-cn.md)
 
 ## Project Overview
-This project aims to develop a Visual Simultaneous Localization and Mapping (VSLAM) system based on a 360-degree panoramic camera. The system is built upon [stella_slam](https://github.com/stella-cv/stella_vslam) and utilizes the insta360 X4 panoramic camera. VSLAM is a technology that uses visual information to enable robots or devices to localize themselves and build maps in unknown environments. It is widely used in autonomous driving, robotic navigation, and augmented reality.
+This project aims to develop a visual simultaneous localization and mapping (VSLAM) system based on a 360-degree panoramic camera. The system is built on [stella_slam](https://github.com/stella-cv/stella_vslam) and uses the Insta360 X4 panoramic camera. VSLAM is a technique that uses visual information to enable a robot or device to localize itself and build a map in an unknown environment. It is widely applied in autonomous driving, robot navigation, augmented reality, and other fields.
 
 ## Features
-- **Panoramic Vision Support**: Captures comprehensive environmental information using a 360-degree panoramic camera.
-- **Real-Time Localization**: Achieves high-precision real-time localization through visual feature matching and optimization algorithms.
-- **Map Construction**: Generates sparse 3D environmental maps.
-- **Map Reuse**: Supports relocalization using prior maps created with panoramic or other cameras.
-- **Modular Design**: The system adopts a modular architecture for easy extension and maintenance.
+- **Panoramic Vision Support**: Captures full-environment information using a 360-degree panoramic camera.  
+- **Real-Time Localization**: Achieves high-precision real-time localization via visual feature matching and optimization algorithms.  
+- **Map Construction**: Generates a sparse 3D map of the environment.  
+- **Map Reuse**: Supports relocalization using a prior map built with either the panoramic camera or another camera type.  
+- **Modular Design**: Employs a modular architecture for easy extension and maintenance.  
 
-## Dependencies
-- **Programming Languages**: C++
+## Environment Dependencies
+- **Programming Language**: C++  
+- **Hardware Requirements**:  
+  - Insta360 X4 360-degree panoramic camera  
 
-- **Hardware Requirements**:
-    - 360-degree panoramic camera insta360 X4
+---
 
 # 1. Using the Panoramic Camera
 
-# 2. Running stella_vslam
+## 1.1) Obtain the SDK
+- https://www.insta360.com/cn/sdk/record  
+- https://github.com/Insta360Develop/  
 
-# 3. Connecting the Panoramic Camera and Running stella_vslam
+## 1.2) Connect the Camera  
+**Insta360 X4**  
+Connect the device via USB and select “Android” mode on the camera’s screen.
 
-
-
-ref:
-
-https://github.com/isri-aist/ros_insta360
+On Linux, ensure your distribution has libusb installed. You can install via yum or apt-get:
+```bash
+sudo apt-get install libusb-dev
+sudo apt-get install libudev-dev
