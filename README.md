@@ -133,6 +133,21 @@ sudo apt update
 sudo apt install ros-humble-tf2-tools
 ```
 
+
+If you are using a Nvidia jetson device, you need to change Hardware decoder method using:
+
+``` bash
+ffmpeg -decoders | grep h264
+ VFS..D h264                 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+ V..... h264_v4l2m2m         V4L2 mem2mem H.264 decoder wrapper (codec h264)
+ V..... h264_nvv4l2dec       h264 (nvv4l2dec) (codec h264)
+```
+
+and change [this line](https://github.com/Longxiaoze/insta360_ros_driver/blob/humble/src/decoder.cpp#L64) in decoder.cpp
+``` c++
+-        const char* decoder_name = "h264_cuvid";
++        const char* decoder_name = "h264_v4l2m2m";
+```
 ## 3.2) Calibrate the Insta360 X4 Fisheyes with ROS2
 
 ### 3.2.1 Calibration
